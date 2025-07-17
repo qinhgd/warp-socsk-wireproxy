@@ -1,4 +1,5 @@
 # .github/workflows/release.yml
+# CORRECTED to build from the root directory
 
 name: Build and Release ARM64 Wireproxy Image
 
@@ -39,9 +40,9 @@ jobs:
       - name: Build and Push ARM64 image to GHCR
         uses: docker/build-push-action@v6
         with:
-          context: ./wireproxy
-          file: ./wireproxy/Dockerfile
-          platforms: linux/arm64 # <-- Only building for ARM64
+          context: . # <-- CORRECTED
+          file: ./Dockerfile # <-- CORRECTED
+          platforms: linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -51,16 +52,14 @@ jobs:
       - name: Build and Export ARM64 Tarball for Release
         uses: docker/build-push-action@v6
         with:
-          context: ./wireproxy
-          file: ./wireproxy/Dockerfile
-          platforms: linux/arm64 # <-- Only building for ARM64
+          context: . # <-- CORRECTED
+          file: ./Dockerfile # <-- CORRECTED
+          platforms: linux/arm64
           push: false
-          # Save the output to a uniquely named tar file
           outputs: type=docker,dest=./wireproxy-arm64-${{ github.ref_name }}.tar
           cache-from: type=gha
 
       - name: Upload ARM64 Tarball to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          # Only upload the ARM64 tarball
           files: ./wireproxy-arm64-${{ github.ref_name }}.tar
